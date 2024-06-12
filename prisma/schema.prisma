@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  password     String
+  pathPassword String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime? @updatedAt @db.Timestamp(3)
+}
+
+model Project {
+  id           String    @id @unique @default(cuid())
+  title        String
+  slug         String    @unique
+  description  String
+  image        String
+  urlVideoDemo String?
+  urlDemo      String?
+  linkGithub   String?
+  isPublish    Boolean
+  updatedAt    DateTime? @updatedAt @db.Timestamp(3)
+  content      String    @db.Text
+  type         String
+  views        Int
+  createdAt    DateTime  @default(now())
+  Stack        Stack[]
+}
+
+model Stack {
+  id        Int     @id @default(autoincrement())
+  name      String
+  logo      String
+  projectId String
+  Project   Project @relation(fields: [projectId], references: [id])
+}
+
+model ShortContent {
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique
+  description String
+  content     String   @db.Text
+  isPublish   Boolean
+  createdAt   DateTime @default(now())
+  likes       Like[]
+  views       Int
+  topics      String[]
+}
+
+model Like {
+  id             Int           @id @default(autoincrement())
+  sessionId      String
+  shortContentId Int?
+  createdAt      DateTime      @default(now())
+  ShortContent   ShortContent? @relation(fields: [shortContentId], references: [id], onDelete: Cascade)
+}
+
+model Career {
+  id        String    @id @unique @default(cuid())
+  position  String
+  company   String
+  logo      String
+  location  String
+  jobType   String
+  startDate DateTime
+  endDate   DateTime?
+  slug      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt @db.Timestamp(3)
+}
